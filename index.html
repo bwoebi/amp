@@ -7,11 +7,130 @@
 <link rel="stylesheet" href="https://stackedit.io/res-min/themes/base.css" />
 <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML"></script>
 </head>
-<body><div class="container"><h1 id="amp-the-guide">Amp: The Guide</h1>
+<body><div class="container"><h1 id="amp">Amp</h1>
 
-<blockquote>
-  <p><strong><a href="#table-of-contents">Table of Contents</a></strong></p>
-</blockquote>
+<p>Amp is a non-blocking concurrency framework for PHP applications</p>
+
+<p><strong>Dependencies</strong></p>
+
+<ul>
+<li>PHP 5.5+</li>
+</ul>
+
+<p>Optional PHP extensions may be used to improve performance in production environments and react to process control signals:</p>
+
+<ul>
+<li><a href="https://github.com/chobie/php-uv">php-uv</a> extension for libuv backends</li>
+<li><a href="http://pecl.php.net/package/libevent">pecl/libevent</a> for libevent backends (<a href="http://windows.php.net/downloads/pecl/releases/libevent/0.0.5/">download Windows .dll</a>)</li>
+</ul>
+
+<p><strong>Installation</strong></p>
+
+
+
+<pre class="prettyprint"><code class="language-bash hljs ">$ git clone https://github.com/amphp/amp.git
+$ <span class="hljs-built_in">cd</span> amp
+$ composer.phar install</code></pre>
+
+<p><strong>Community</strong></p>
+
+<p>If you have questions stop by the <a href="https://gitter.im/amphp/amp">amp chat channel</a> on Gitter.</p>
+
+
+
+<h2 id="table-of-contents">Table of Contents</h2>
+
+<p><div class="toc">
+<ul>
+<li><a href="#amp">Amp</a><ul>
+<li><a href="#table-of-contents">Table of Contents</a></li>
+<li><a href="#event-reactor-concepts">Event Reactor Concepts</a><ul>
+<li><a href="#reactor-implementations">Reactor Implementations</a></li>
+<li><a href="#reactor-task-scheduler">Reactor == Task Scheduler</a></li>
+<li><a href="#the-universal-reactor">The Universal Reactor</a></li>
+</ul>
+</li>
+<li><a href="#controlling-the-reactor">Controlling the Reactor</a><ul>
+<li><a href="#run">run()</a></li>
+<li><a href="#tick">tick()</a></li>
+<li><a href="#stop">stop()</a></li>
+</ul>
+</li>
+<li><a href="#timer-watchers">Timer Watchers</a><ul>
+<li><a href="#immediately">immediately()</a></li>
+<li><a href="#once">once()</a></li>
+<li><a href="#repeat">repeat()</a></li>
+<li><a href="#at">at()</a></li>
+</ul>
+</li>
+<li><a href="#stream-io-watchers">Stream IO Watchers</a><ul>
+<li><a href="#onreadable">onReadable()</a></li>
+<li><a href="#onwritable">onWritable()</a></li>
+</ul>
+</li>
+<li><a href="#pausing-resuming-and-cancelling-watchers">Pausing, Resuming and Cancelling Watchers</a><ul>
+<li><a href="#disable">disable()</a></li>
+<li><a href="#enable">enable()</a></li>
+<li><a href="#cancel">cancel()</a></li>
+</ul>
+</li>
+<li><a href="#process-signal-watchers">Process Signal Watchers</a></li>
+<li><a href="#reactor-addenda">Reactor Addenda</a><ul>
+<li><a href="#callback-invocation-parameters">Callback Invocation Parameters</a></li>
+<li><a href="#watcher-cancellation-safety">Watcher Cancellation Safety</a></li>
+<li><a href="#an-important-note-on-writability">An Important Note on Writability</a></li>
+<li><a href="#process-signal-number-availability">Process Signal Number Availability</a></li>
+</ul>
+</li>
+<li><a href="#managing-concurrency">Managing Concurrency</a><ul>
+<li><a href="#promises">Promises</a><ul>
+<li><a href="#the-promise-api">The Promise API</a></li>
+<li><a href="#when">when()</a></li>
+<li><a href="#watch">watch()</a></li>
+</ul>
+</li>
+<li><a href="#promisors">Promisors</a><ul>
+<li><a href="#the-promisor-api">The Promisor API</a></li>
+<li><a href="#future-promisor">Future Promisor</a></li>
+<li><a href="#privatefuture-promisor">PrivateFuture Promisor</a></li>
+<li><a href="#promisor-example">Promisor Example</a></li>
+</ul>
+</li>
+<li><a href="#combinators">Combinators</a><ul>
+<li><a href="#all">all()</a></li>
+<li><a href="#some">some()</a></li>
+<li><a href="#first">first()</a></li>
+<li><a href="#map">map()</a></li>
+<li><a href="#filter">filter()</a></li>
+</ul>
+</li>
+<li><a href="#generators">Generators</a></li>
+<li><a href="#implicit-yield-behavior">Implicit Yield Behavior</a></li>
+<li><a href="#yield-command-reference">Yield Command Reference</a></li>
+<li><a href="#yield-command-examples">Yield Command Examples</a><ul>
+<li><a href="#yield-pause">yield pause</a></li>
+<li><a href="#yield-immediately">yield immediately</a></li>
+<li><a href="#yield-once">yield once</a></li>
+<li><a href="#yield-repeat">yield repeat</a></li>
+<li><a href="#yield-onreadable">yield onreadable</a></li>
+<li><a href="#yield-onwritable">yield onwritable</a></li>
+<li><a href="#yield-enable">yield enable</a></li>
+<li><a href="#yield-disable">yield disable</a></li>
+<li><a href="#yield-cancel">yield cancel</a></li>
+<li><a href="#yield-all">yield all</a></li>
+<li><a href="#yield-any">yield any</a></li>
+<li><a href="#yield-some">yield some</a></li>
+<li><a href="#yield-bind">yield bind</a></li>
+<li><a href="#yield-nowait">yield nowait</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</p>
 
 <hr>
 
@@ -830,6 +949,8 @@ discarded. Array keys are retained for any results not filtered out by the funct
 
 <p>The addition of Generators in PHP 5.5 trivializes synchronization and error handling in async contexts. The Amp event reactor builds in co-routine support for all reactor callbacks so we can use the <code>yield</code> keyword to make async code feel synchronous. Let’s look at a simple example executing inside the event reactor run loop (covered later):</p>
 
+
+
 <pre class="prettyprint"><code class="language-php hljs "><span class="hljs-preprocessor">&lt;?php</span>
 
 <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">asyncMultiply</span><span class="hljs-params">(x, <span class="hljs-variable">$y</span>)</span> {</span>
@@ -862,6 +983,8 @@ are still pending.</p>
   
   <p>When yielding <code>Amp\Promise</code> instances that should the computation fail the relevant exception will be thrown back into your generator. Applications should generally wrap their promise yields in <code>try/catch</code> blocks.</p>
 </blockquote>
+
+
 
 <h3 id="implicit-yield-behavior">Implicit Yield Behavior</h3>
 
@@ -1231,104 +1354,5 @@ are still pending.</p>
     <span class="hljs-variable">$startTime</span> = time();
     <span class="hljs-keyword">yield</span> myAsyncThing();
     var_dump(time() - <span class="hljs-variable">$startTime</span>); <span class="hljs-comment">// int(3)</span>
-};</code></pre>
-
-<hr>
-
-
-
-<h2 id="table-of-contents">Table of Contents</h2>
-
-<p><div class="toc"><div class="toc">
-<ul>
-<li><a href="#amp-the-guide">Amp: The Guide</a><ul>
-<li><a href="#event-reactor-concepts">Event Reactor Concepts</a><ul>
-<li><a href="#reactor-implementations">Reactor Implementations</a></li>
-<li><a href="#reactor-task-scheduler">Reactor == Task Scheduler</a></li>
-<li><a href="#the-universal-reactor">The Universal Reactor</a></li>
-</ul>
-</li>
-<li><a href="#controlling-the-reactor">Controlling the Reactor</a><ul>
-<li><a href="#run">run()</a></li>
-<li><a href="#tick">tick()</a></li>
-<li><a href="#stop">stop()</a></li>
-</ul>
-</li>
-<li><a href="#timer-watchers">Timer Watchers</a><ul>
-<li><a href="#immediately">immediately()</a></li>
-<li><a href="#once">once()</a></li>
-<li><a href="#repeat">repeat()</a></li>
-<li><a href="#at">at()</a></li>
-</ul>
-</li>
-<li><a href="#stream-io-watchers">Stream IO Watchers</a><ul>
-<li><a href="#onreadable">onReadable()</a></li>
-<li><a href="#onwritable">onWritable()</a></li>
-</ul>
-</li>
-<li><a href="#pausing-resuming-and-cancelling-watchers">Pausing, Resuming and Cancelling Watchers</a><ul>
-<li><a href="#disable">disable()</a></li>
-<li><a href="#enable">enable()</a></li>
-<li><a href="#cancel">cancel()</a></li>
-</ul>
-</li>
-<li><a href="#process-signal-watchers">Process Signal Watchers</a></li>
-<li><a href="#reactor-addenda">Reactor Addenda</a><ul>
-<li><a href="#callback-invocation-parameters">Callback Invocation Parameters</a></li>
-<li><a href="#watcher-cancellation-safety">Watcher Cancellation Safety</a></li>
-<li><a href="#an-important-note-on-writability">An Important Note on Writability</a></li>
-<li><a href="#process-signal-number-availability">Process Signal Number Availability</a></li>
-</ul>
-</li>
-<li><a href="#managing-concurrency">Managing Concurrency</a><ul>
-<li><a href="#promises">Promises</a><ul>
-<li><a href="#the-promise-api">The Promise API</a></li>
-<li><a href="#when">when()</a></li>
-<li><a href="#watch">watch()</a></li>
-</ul>
-</li>
-<li><a href="#promisors">Promisors</a><ul>
-<li><a href="#the-promisor-api">The Promisor API</a></li>
-<li><a href="#future-promisor">Future Promisor</a></li>
-<li><a href="#privatefuture-promisor">PrivateFuture Promisor</a></li>
-<li><a href="#promisor-example">Promisor Example</a></li>
-</ul>
-</li>
-<li><a href="#combinators">Combinators</a><ul>
-<li><a href="#all">all()</a></li>
-<li><a href="#some">some()</a></li>
-<li><a href="#first">first()</a></li>
-<li><a href="#map">map()</a></li>
-<li><a href="#filter">filter()</a></li>
-</ul>
-</li>
-<li><a href="#generators">Generators</a></li>
-<li><a href="#implicit-yield-behavior">Implicit Yield Behavior</a></li>
-<li><a href="#yield-command-reference">Yield Command Reference</a></li>
-<li><a href="#yield-command-examples">Yield Command Examples</a><ul>
-<li><a href="#yield-pause">yield pause</a></li>
-<li><a href="#yield-immediately">yield immediately</a></li>
-<li><a href="#yield-once">yield once</a></li>
-<li><a href="#yield-repeat">yield repeat</a></li>
-<li><a href="#yield-onreadable">yield onreadable</a></li>
-<li><a href="#yield-onwritable">yield onwritable</a></li>
-<li><a href="#yield-enable">yield enable</a></li>
-<li><a href="#yield-disable">yield disable</a></li>
-<li><a href="#yield-cancel">yield cancel</a></li>
-<li><a href="#yield-all">yield all</a></li>
-<li><a href="#yield-any">yield any</a></li>
-<li><a href="#yield-some">yield some</a></li>
-<li><a href="#yield-bind">yield bind</a></li>
-<li><a href="#yield-nowait">yield nowait</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a href="#table-of-contents">Table of Contents</a></li>
-</ul>
-</li>
-</ul>
-</div>
-</div>
-</p></div></body>
+};</code></pre></div></body>
 </html>
